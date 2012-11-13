@@ -1,0 +1,236 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <title>Modular</title>
+  <meta name="description" content="">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    label {
+      margin-bottom: 0.2em;
+    }
+    label, input {
+      display:block;
+    }
+    input, select {
+      margin-bottom:1em;
+    }
+    select {
+      font-size:1em;
+    }
+    .modules {
+      overflow:hidden;
+      margin-top:2em;
+    }
+    .module {
+      border: 1px solid #000;
+      float:left;
+      padding:0 0.5em;
+      margin:0 0.5em 0 0;
+    }
+    .module h3 {
+      padding:0.5em 0;
+      margin:0;
+      border-top:1px solid #888;
+    }
+    #keyboard {
+      height:10em;
+      position:relative;
+    }
+    .key {
+
+      box-sizing: border-box;
+      position:absolute;
+    }
+    .ebony {
+      width:4em;
+      z-index:2;
+      top:0;
+      height:60%;
+      background:#000;
+      border:1px solid #fff;
+      border-top:0;
+    }
+    .ivory {
+      width:4em;
+      z-index:1;
+      bottom:0;
+      height:100%;
+      background:#fff;
+      border:1px solid #000;
+    }
+    #keyboard .active {
+      background:#f00;
+    }
+    #A3 { left:0; }
+    #Bf3 { left:2em; }
+    #B3 { left:4em; }
+    #C3 { left:8em; }
+    #Df3 { left:10em; }
+    #D3 { left:12em; }
+    #Ef3 { left:14em; }
+    #E3 { left:16em; }
+    #F3 { left:20em; }
+    #Gf3 { left:22em; }
+    #G3 { left:24em; }
+    #Af3 { left:26em; }
+    #A4 { left:28em; }
+    #Bf4 { left:30em; }
+    #B4 { left:32em; }
+    #C4 { left:36em; }
+
+    #test-output {
+      min-height:100px;
+      border: 1px solid #000;
+      margin-top:2em;
+    }
+  </style>
+
+</head>
+<body>
+
+<h1>Web Audio API Synthesizer</h1>
+
+<div id="keyboard">
+  <div class="ivory key" id="A3"></div>
+  <div class="ebony key" id="Bf3"></div>
+  <div class="ivory key" id="B3"></div>
+  <div class="ivory key" id="C3"></div>
+  <div class="ebony key" id="Df3"></div>
+  <div class="ivory key" id="D3"></div>
+  <div class="ebony key" id="Ef3"></div>
+  <div class="ivory key" id="E3"></div>
+  <div class="ivory key" id="F3"></div>
+  <div class="ebony key" id="Gf3"></div>
+  <div class="ivory key" id="G3"></div>
+  <div class="ebony key" id="Af3"></div>
+  <div class="ivory key" id="A4"></div>
+  <div class="ebony key" id="Bf4"></div>
+  <div class="ivory key" id="B4"></div>
+  <div class="ivory key" id="C4"></div>
+</div>
+
+<div class="modules">
+
+  <div class="oscillator module">
+    <h2>OSC 1</h2>
+    <label>Type</label>
+    <select name="type" class="type">
+      <option value="0">Sine</option>
+      <option value="1">Square</option>
+      <option value="2">Saw</option>
+      <option value="3">Triangle</option>
+    </select>
+    <label>Envelope</label>
+    <select name="envelope" class="envelope">
+      <option value="square">Square</option>
+      <option value="adsr">ADSR 1</option>
+    </select>
+    <label>Envelope LFO</label>
+    <input class="envelope-lfo" max="2.0" step="0.01" type="range" value="0" />
+  </div>
+
+  <div class="adsr module">
+    <h2>ADSR 1</h2>
+    <label>Attack Time</label>
+    <input class="attack-time" type="range" max="2.0" step="0.1" value="0.1"/>
+    <label>Attack Gain</label>
+    <input class="attack-gain" type="range" max="1.0" step="0.01" value="1"/>
+    <label>Decay Time</label>
+    <input class="decay-time" type="range" max="2.0" step="0.1" value="0.1"/>
+    <label>Sustain Gain</label>
+    <input class="sustain-gain" type="range" max="1.0" step="0.01" value="0.1"/>
+    <label>Release Time</label>
+    <input class="release-time" type="range" max="2.0" step="0.1" value="1"/>
+  </div>
+
+  <div class="filter module" id="filter1">
+    <h2>Filter 1</h2>
+    <label>Type</label>
+    <select name="filter-type" class="type">
+      <option value="0">LPF</option>
+      <option value="1">HPF</option>
+      <option value="2">Band Pass</option>
+      <option value="3">Low Shelf</option>
+      <option value="4">High Shelf</option>
+      <option value="5">Peaking</option>
+      <option value="6">Notch</option>
+      <option value="7">All Pass</option>
+    </select>
+    <label>Frequency</label>
+    <input class="frequency" type="range" min="0.001" max="1" step="0.001" value="1"/>
+    <label>Q</label>
+    <input class="Q" type="range" min="0.001" max="1" step="0.001" value="0.5"/>
+    <label>Gain</label>
+    <input class="gain" type="range" min="0.001" max="1" step="0.001" value="0.001"/>
+    <h3>Modulation</h3>
+    <label>Bypass</label>
+    <input class="mod-bypass" type="checkbox" />
+    <label>Invert</label>
+    <input class="mod-invert" type="checkbox" />
+    <label>Parameter</label>
+    <select name="filter-mod-param" class="mod-param">
+      <option value="frequency">Frequency</option>
+      <option value="Q">Q</option>
+    </select>
+    <label>Width</label>
+    <input class="mod-width" type="range" max="1" step="0.01" value="0"/>
+    <label>Sensitivity</label>
+    <input class="mod-sens" type="range" min="0.01" max="2" step="0.01" value="1"/>
+
+    <!--
+    <label>Track Pad</label>
+    <input name="trackpad" type="checkbox" />
+    -->
+  </div>
+
+  <div class="lfo module">
+    <h2>LFO 1</h2>
+    <label>Frequency</label>
+    <input class="frequency" type="range" min="1" max="100" step="1" value="1"/>
+    <label>Type</label>
+    <select name="lfo">
+      <option value="0">Sine</option>
+      <option value="1">Square</option>
+      <option value="2">Saw</option>
+      <option value="3">Triangle</option>
+    </select>
+  </div>
+
+</div>
+
+<div id="test-output">
+  <h6>filter frequency</h6>
+  <div id="filter-frequency"></div>
+  <h6>adsr gain</h6>
+  <div id="adsr-gain"></div>
+
+  <div id="open-keys"></div>
+
+  <div id="released-keys"></div>
+</div>
+
+
+<script src="js/lib.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="js/patch.js"></script>
+<script src="js/destination.js"></script>
+<script src="js/modules/module.js"></script>
+<script src="js/modules/sources/pool.js"></script>
+<script src="js/modules/sources/source-pool.js"></script>
+<script src="js/modules/sources/oscillator-pool.js"></script>
+<script src="js/modules/sources/envelope.js"></script>
+<script src="js/modules/sources/adsr.js"></script>
+<script src="js/modules/filter.js"></script>
+<script src="js/modules/modulator.js"></script>
+<script src="js/modules/lfo.js"></script>
+
+<!-- the bootstrap script -->
+<script src="js/synth.js"></script>
+
+</body>
+</html>
