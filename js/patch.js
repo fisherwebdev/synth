@@ -1,15 +1,17 @@
 /* Patch
  *
- * the options may have the following attributes:
- * origin - a Module or Source (required)
- * originIndex - the output index of the origin (defaults to zero)
- * destination - a Module or Destination (required)
- * destinationIndex - the input index of the destination (defaults to zero)
+ * The edge of the graph.
  *
- * otherwise, connections can be made with calls to setTerminal prior to createConnection.
+ * The options may have the following attributes:
+ *   origin: a Module or Source (required)
+ *   originIndex: the output index of the origin (defaults to zero)
+ *   destination: a Module or Destination (required)
+ *   destinationIndex: the input index of the destination (defaults to zero)
+ *
+ * Otherwise, connections can be made with calls to setTerminal prior to createConnection.
  *
  */
-var Patch = function (context, opts) { // this is an edge of the graph
+var Patch = function (context, opts) {
   this.context = context;
   this.terminals = 0;
   if (this.setBothTerminals(opts)) {

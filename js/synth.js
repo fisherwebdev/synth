@@ -6,7 +6,8 @@ var releasedkeys = document.getElementById("released-keys");
 
 
 var context = new webkitAudioContext();
-var oscillators = new OscillatorPool(context, document.querySelector(".oscillator"));
+// var oscillators = new OscillatorPool(context, document.querySelector(".oscillator"));
+var oscillators = new OscillatorNoteManager(context, document.querySelector(".oscillator"));
 var filter = new Filter(context, document.querySelector(".filter"), {type: 0});
 var speaker = new Destination(context);
 

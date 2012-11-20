@@ -38,11 +38,10 @@
       border-top:1px solid #888;
     }
     #keyboard {
-      height:10em;
+      height:12em;
       position:relative;
     }
     .key {
-
       box-sizing: border-box;
       position:absolute;
     }
@@ -50,7 +49,7 @@
       width:4em;
       z-index:2;
       top:0;
-      height:60%;
+      height:55%;
       background:#000;
       border:1px solid #fff;
       border-top:0;
@@ -62,6 +61,7 @@
       height:100%;
       background:#fff;
       border:1px solid #000;
+      border-radius: 0 0 6px 6px;
     }
     #keyboard .active {
       background:#f00;
@@ -164,9 +164,9 @@
     <label>Frequency</label>
     <input class="frequency" type="range" min="0.001" max="1" step="0.001" value="1"/>
     <label>Q</label>
-    <input class="Q" type="range" min="0.001" max="1" step="0.001" value="0.5"/>
+    <input class="Q" type="range" min="0.01" max="1" step="0.01" value="0.3"/>
     <label>Gain</label>
-    <input class="gain" type="range" min="0.001" max="1" step="0.001" value="0.001"/>
+    <input class="gain" type="range" max="16" step="1" value="0"/>
     <h3>Modulation</h3>
     <label>Bypass</label>
     <input class="mod-bypass" type="checkbox" />
@@ -176,9 +176,10 @@
     <select name="filter-mod-param" class="mod-param">
       <option value="frequency">Frequency</option>
       <option value="Q">Q</option>
+      <option value="frequency-and-Q">Freq &amp; Q</option>
     </select>
     <label>Width</label>
-    <input class="mod-width" type="range" max="1" step="0.01" value="0"/>
+    <input class="mod-width" type="range" max="1" step="0.01" value="1"/>
     <label>Sensitivity</label>
     <input class="mod-sens" type="range" min="0.01" max="2" step="0.01" value="1"/>
 
@@ -220,11 +221,21 @@
 <script src="js/patch.js"></script>
 <script src="js/destination.js"></script>
 <script src="js/modules/module.js"></script>
+
+<script src="js/modules/sources/note.js"></script>
+<script src="js/modules/sources/oscillator-note.js"></script>
+<script src="js/modules/sources/note-manager.js"></script>
+<script src="js/modules/sources/oscillator-note-manager.js"></script>
+
+<!--
 <script src="js/modules/sources/pool.js"></script>
 <script src="js/modules/sources/source-pool.js"></script>
 <script src="js/modules/sources/oscillator-pool.js"></script>
+-->
+
 <script src="js/modules/sources/envelope.js"></script>
 <script src="js/modules/sources/adsr.js"></script>
+
 <script src="js/modules/filter.js"></script>
 <script src="js/modules/modulator.js"></script>
 <script src="js/modules/lfo.js"></script>

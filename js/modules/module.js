@@ -13,7 +13,7 @@ var Module = function (context, elem, opts) {
   this.context = context;
   this.elem = elem;
 
-  this.addEventListeners(this.getUI(elem));
+  this.addUIEventListeners(this.getUI(elem));
 
 };
 Module.prototype = {
@@ -47,12 +47,12 @@ Module.prototype = {
 
 
   /**
-   * Adds event listeners to each UI control element in the ui hash.  These listeners will update the public properties
+   * Add event listeners to each UI control element in the ui hash.  These listeners will update the public properties
    * that are associated with each control.
    *
    * @param {Object} ui The object literal (hash) that describes the UI elements.  see getUI().
    */
-  addEventListeners: function (ui) {
+  addUIEventListeners: function (ui) {
 
     var that = this;
 

@@ -14,36 +14,29 @@ var Filter = function (context, elem, opts) {
 
   this.context = context;
   this.elem = elem;
-  this.type = opts.type || 0;
-  this.frequency = opts.frequency || this.context.sampleRate / 2;
-  this.Q = opts.Q || 0.5;
   this.QUAL_MUL = 30;
-  this.gain = opts.gain || 1;
+  this.frequency = opts.frequency || 1;
+  this.Q = opts.Q || 0.5;
 
   node = this.node = context.createBiquadFilter();
-  node.type = this.type;
-  node.frequency.value = this.frequency;
+  node.type = opts.type || 0;
+  node.frequency.value = this.getFrequencyFromLinear(this.frequency);
   node.Q.value = this.Q;
-  node.gain.value = this.gain;
-
-  ui = this.getUI(elem);
-  this.addEventListeners(ui);
+  node.gain.value = opts.gain || 0;
 
   // parameter modulator
   this.modulator = context.createScriptProcessorNode ?
-    context.createScriptProcessorNode(256, 1, 1) : // new style
+    context.createScriptProcessorNode(256, 1, 1) : // new syntax
     context.createJavaScriptNode(256, 1, 1);       // deprecated
-
-  window.filternode = node
-  window.modulator = this.modulator
-
   this.modulator.onaudioprocess = function (e) {
     that.modulate(e, that);
   };
+
+  ui = this.getUI(elem);
   this.modInvert = "";
   this.modParam = (ui.modParam && ui.modParam.value) || "frequency";
-  this.modWidth = (ui.modWidth && ui.modWidth.value) || 0;
-  this.modSens = (ui.modSens && ui.modSens.value) || 1;
+  this.modWidth = (ui.modWidth && parseFloat(ui.modWidth.value)) || 0;
+  this.modSens = (ui.modSens && parseFloat(ui.modSens.value)) || 1;
   this.modulator.connect(context.destination);
   this.modBypass = false;
 
@@ -52,8 +45,13 @@ var Filter = function (context, elem, opts) {
 
   this.inputs = [this.node, this.node.frequency, this.node.Q, this.node.gain, this.modulator];
   this.outputs = [this.compressor, this.node.frequency, this.node.Q, this.node.gain, this.node, this.modulator];
+
+  this.addUIEventListeners(ui);
+
 };
+
 Filter.prototype = {
+
 
   /**
    * This method returns the ui hash with camelCased keys based on hyphenated class names. For example, a class name
@@ -78,13 +76,14 @@ Filter.prototype = {
     return ui;
   },
 
+
   /**
    * Adds event listeners to each UI control element in the ui hash.  These listeners will update the public properties
    * that are associated with each control.
    *
    * @param {Object} ui The object literal (hash) that describes the UI elements.  see getUI().
    */
-  addEventListeners: function (ui) {
+  addUIEventListeners: function (ui) {
     var that = this;
     for (param in ui) {
       ui[param].addEventListener("change", function (e) {
@@ -93,6 +92,7 @@ Filter.prototype = {
       });
     }
   },
+
 
   /**
    * This method wraps and exposes the filter node's getFrequencyResponse method.
@@ -103,6 +103,7 @@ Filter.prototype = {
     return this.node.getFrequencyResponse(frequencyHz, magResponse, phaseResponse);
   },
 
+
   /**
    * Sets a parameter (that is, a public property) of the filter immediately, at the current time.
    * @param {String} parameter
@@ -110,49 +111,54 @@ Filter.prototype = {
    */
   setParam: function (parameter, value) {
 
-    var nonstandards = ["frequency", "Q", "modBypass", "modInvert"];
-    if (nonstandards.indexOf(parameter) === -1) {
-      console.log('set param', parameter, value, this.node)
+    var basics = ["modSens", "modWidth", "modParam"],
+        alphas = ["modParam", "modBypass", "modInvert"];
+
+    if (alphas.indexOf(parameter) === -1) {
+      value = parseFloat(value)
+    }
+
+    if (basics.indexOf(parameter) !== -1) {
       this[parameter] = value;
     }
 
-    switch (parameter) {
-      case "type":
-        this.node.type = value;
-        break;
-      case "frequency":
-        this.changeFrequency(value);
-        break;
-      case "Q":
-        var q = value * this.QUAL_MUL;
-        this.Q = q;
-        this.node.Q.value = q;
-        break;
-      case "gain":
-        this.node.gain.setValueAtTime(value, this.context.currentTime);
-        break;
-      case "modInvert":
-        this.modInvert = this.elem.querySelector(".mod-invert").checked;
-        break;
-      case "modBypass":
-        this.modBypass = this.elem.querySelector(".mod-bypass").checked;
-        break;
+    else {
+      switch (parameter) {
+        case "type":
+          this.node.type = value;
+          break;
+        case "frequency":
+          this.frequency = value;
+          this.node.frequency.value = this.getFrequencyFromLinear(value);
+          break;
+        case "Q":
+          this.Q = value;
+          var q = value * this.QUAL_MUL;
+          this.node.Q.value = this.Q = q;
+          break;
+        case "gain":
+          this.node.gain.value = value;
+          break;
+        case "modInvert":
+          this.modInvert = this.elem.querySelector(".mod-invert").checked;
+          break;
+        case "modBypass":
+          this.modBypass = this.elem.querySelector(".mod-bypass").checked;
+          break;
+      }
     }
 
   },
 
-  changeFrequency: function (value) {
-    var minValue = 40, // changing this value appears to change the input gain (adsrgain).  why?  this is a bug.
-        maxValue = this.context.sampleRate / 2,
+
+  getFrequencyFromLinear: function (value, minFreq, maxFreq) {
+    var minValue = minFreq || 40, // changing this value appears to change the input gain (adsrgain).  why?  this is a bug?
+        maxValue = maxFreq || this.context.sampleRate / 2,
         numberOfOctaves = Math.log(maxValue / minValue) / Math.LN2,
         multiplier = Math.pow(2, numberOfOctaves * (value - 1.0));
-    this.node.frequency.value = this.frequency = maxValue * multiplier;
-
-    filterfrequency.innerText = this.node.frequency.value;
-    adsrgain.innerText = value
-    openkeys.innerText = minValue + " to " + maxValue;
-    releasedkeys.innerText = numberOfOctaves + " octaves";
+    return maxValue * multiplier
   },
+
 
   /**
    * Modulate a filter parameter.  This is an event handler, so we pass the context of the filter to it with the "that"
@@ -169,15 +175,51 @@ Filter.prototype = {
         param = that.modParam;
 
     if (that.modInvert === true) {
-      value = 1 - value;
+      value = Math.max(1, that.modSens) - value;
     }
 
-    if (param === "frequency-and-Q") {
-      that.setParam.call(that, "Q", value);
-      that.setParam.call(that, "frequency", value);
+    switch (param) {
+      case "frequency":
+        that.modulateFrequency.call(that, value);
+        break;
+      case "Q":
+        that.modulateQ.call(that, value);
+        break;
+      case "frequency-and-Q":
+        that.modulateQ.call(that, value);
+        that.modulateFrequency.call(that, value);
+        break;
     }
-    else {
-      that.setParam.call(that, param, value);
-    }
+
+    // log out to screen
+    filterfrequency.innerText = param;
+    adsrgain.innerText = value
+
+
+  },
+
+
+  modulateFrequency: function (value) {
+
+    var minValue = Math.max(0.01, this.frequency - this.modWidth),
+        maxValue = Math.min(1, this.frequency + this.modWidth),
+        minFreq  = this.getFrequencyFromLinear(minValue),
+        maxFreq  = this.getFrequencyFromLinear(maxValue);
+
+    this.node.frequency.value = this.getFrequencyFromLinear(value, minFreq, maxFreq);
+
+    // log out to screen
+    openkeys.innerText = minValue + " to " + maxValue;
+    releasedkeys.innerText = minFreq + " to " + maxFreq;
+
+  },
+
+  modulateQ: function (value) {
+    var minValue = Math.max(0, this.q - this.modWidth),
+        maxValue = this.q - this.modWidth,
+        delta = maxValue - minValue,
+        q = value * delta * this.QUAL_MUL;
+    this.node.Q.value = q;
   }
+
 }
