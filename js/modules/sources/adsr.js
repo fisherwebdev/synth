@@ -18,15 +18,20 @@ var ADSR = function (context, elem, opts) {
   this.envelope = opts.envelope;
   this.node = (opts.envelope && opts.envelope.node) || opts.gainNode || context.createGainNode();
 
-  this.attackTime  = opts.attackTime  || 0.1;
-  this.attackGain  = opts.attackGain  || 1;
-  this.decayTime   = opts.decayTime   || 0.1;
-  this.sustainGain = opts.sustainGain || 0.1;
-  this.releaseTime = opts.releaseTime || 1;
+  this.squareDefaults = {
+    attackTime:  0.01,
+    attackGain:  1,
+    decayTime:   0,
+    sustainGain: 1,
+    releaseTime: 0.01,
+    attackRamp:  "linear",
+    decayRamp:   "linear",
+    releaseRamp: "linear"
+  }
 
-  this.attackRamp  = opts.attackRamp  || "linear";
-  this.decayRamp   = opts.decayRamp   || "linear";
-  this.releaseRamp = opts.releaseRamp || "linear";
+  for (key in squareDefaults) {
+    this[key] = opts[key] || squareDefaults[key];
+  }
 
   // TODO : figure out the real calculus here
   this.timeConstantFactors = opts.timeConstantFactors || {

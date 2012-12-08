@@ -1,7 +1,12 @@
-/* library of utility classes and functions
+/* Library of utility classes and functions */
+
+
+
+/* Object-oriented utilities
  *
  * Interface, clone, extend, augment are from "Pro JavaScript Design Patterns" by Harmes and Diaz.
  */
+
 var Interface = function(name, methods) {
   if(arguments.length != 2) {
     throw new Error("Interface constructor called with " + arguments.length
@@ -42,11 +47,11 @@ Interface.ensureImplements = function(object) { // Static class method.
   }
 };
 
-/* classical inheritance with the extends() function
- *
+/* Classical inheritance with the extends() function
  *
  * This is based on the extends function in Pro JavaScript Design Patterns by Harmes and Diaz,
- * but I added the properties argument to allow an easy way to declare additional methods.
+ * but I added the properties argument to allow an easy way to declare additional or overriding
+ * methods.
  *
  * Note: within subclass constructors, you call the superclass constructor like so:
  * SubClass.superclass.constructor.call(this, [arg1], [arg2], ... )
@@ -94,6 +99,10 @@ var override = function (obj, methods) {
     obj.prototype[prop] = methods[prop];
   }
 };
+
+
+
+/* Strings */
 
 var capitalize = function (str) {
   return str[0].toUpperCase() + str.slice(1);

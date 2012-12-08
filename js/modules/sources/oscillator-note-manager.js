@@ -56,9 +56,10 @@ extend(OscillatorNoteManager, NoteManager, {
    * @param type
    */
   changeType: function (type) {
-    this.oscillators.forEach(function (osc) {
+    for (osc in this.sources) {
       osc.type = type;
-    });
+    };
+    this.type = type;
   }
 
 

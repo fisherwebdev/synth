@@ -25,48 +25,10 @@ var Envelope = function (context, elem, opts) {
 
 Envelope.prototype = {
 
-
-  open: function (id) {
-    if (this.type === "adsr") {
-      this.adsr.open(id);
-    }
-    else { // square
-      this.node.gain.value = 1;
-    }
-  },
-
-
-  release: function (id) {
-    if (this.type === "adsr") {
-      this.adsr.release(id);
-    }
-    else { // square
-      this.node.gain.value = 0;
-      this.triggerEnvClosedEvent(id);
-    }
-  },
-
-
-//  addEventListeners: function (elem) {
-//    var that = this;
-//    elem.querySelector(".envelope").addEventListener("change", function (e) {
-//
-//      console.log('test');
-//
-//      that.type = e.target.value;
-//      e.target.blur();
-//    });
-//    elem.querySelector(".envelope-lfo").addEventListener("change", function (e) {
-//      // TODO ... not sure how to do this.
-//      // console.log(e.target.value);
-//    });
-//  },
-//
-//  removeEventListeners: function () {
-//    elem.querySelector(".envelope").removeEventListener("change");
-//  },
-
-
+  /**
+   *
+   * @param id
+   */
   triggerEnvClosedEvent: function (id) {
     var envEvent = document.createEvent("Event"),
       eventName = "envelope.closed";
@@ -75,20 +37,32 @@ Envelope.prototype = {
     this.elem.dispatchEvent(envEvent); // SourceNodes are listening to this
   },
 
+
   /**
    *
-   * @param destination
+   * @param id
    */
-  connect: function (destination) {
-    this.node.connect(destination);
-  },
+  open: this.adsr.open,
+
+
+  /**
+   *
+   * @param id
+   */
+  release: this.adsr.release,
+
 
   /**
    *
    * @param destination
    */
-  disconnect: function (destination) {
-    this.node.disconnect(destination);
-  }
+  connect: this.node.connect,
+
+
+  /**
+   *
+   * @param destination
+   */
+  disconnect: this.node.disconnect
 
 };
