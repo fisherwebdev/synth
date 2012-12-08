@@ -29,8 +29,8 @@ var ADSR = function (context, elem, opts) {
     releaseRamp: "linear"
   }
 
-  for (key in squareDefaults) {
-    this[key] = opts[key] || squareDefaults[key];
+  for (key in this.squareDefaults) {
+    this[key] = opts[key] || this.squareDefaults[key];
   }
 
   // TODO : figure out the real calculus here

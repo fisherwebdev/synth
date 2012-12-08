@@ -17,7 +17,6 @@ var Envelope = function (context, elem, opts) {
   this.adsr = opts.adsr || new ADSR(context, elem.parentNode.querySelector(".adsr"), {envelope: this});
   this.lfo = opts.lfo || new LFO(context, elem.parentNode.querySelector(".lfo"));
 
-
   //this.type = "adsr";
 
   //this.addEventListeners(elem);
@@ -42,27 +41,35 @@ Envelope.prototype = {
    *
    * @param id
    */
-  open: this.adsr.open,
+  open: function (id) {
+    this.adsr.open(id);
+  },
 
 
   /**
    *
    * @param id
    */
-  release: this.adsr.release,
+  release: function (id) {
+    this.adsr.release(id);
+  },
 
 
   /**
    *
    * @param destination
    */
-  connect: this.node.connect,
+  connect: function (destination) {
+    this.node.connect(destination);
+  },
 
 
   /**
    *
    * @param destination
    */
-  disconnect: this.node.disconnect
+  disconnect: function (destination) {
+    this.node.disconnect(destination);
+  }
 
 };
